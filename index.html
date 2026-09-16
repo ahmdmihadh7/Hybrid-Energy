@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hybrid Renewable Energy Monitoring Dashboard | EEE Simulation</title>
+  <meta name="description" content="Simulation and visualization dashboard for a hybrid renewable energy system combining Solar PV, Wind Energy, Battery Storage, and Electrical Load.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN for interactive graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION ================= -->
+  <header class="navbar" id="topNavbar">
+    <div class="nav-container">
+      <a href="#home" class="nav-brand" aria-label="Hybrid Energy Dashboard Home">
+        <img src="assets/renewable-energy.svg" alt="Hybrid Energy Logo" class="brand-logo">
+        <div class="brand-text">
+          <span class="brand-title">HYBRID ENERGY</span>
+          <span class="brand-tag">EEE VIRTUAL LAB</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="nav-menu" id="navMenu" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
+          <li><a href="#solar" class="nav-link">Solar</a></li>
+          <li><a href="#wind" class="nav-link">Wind</a></li>
+          <li><a href="#battery" class="nav-link">Battery</a></li>
+          <li><a href="#analytics" class="nav-link">Analytics</a></li>
+          <li><a href="#calculator" class="nav-link">Calculator</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <!-- Nav Actions (Theme Toggle & Hamburger) -->
+      <div class="nav-actions">
+        <button id="themeToggleBtn" class="icon-btn" aria-label="Toggle Dark and Light Mode" title="Toggle Theme">
+          <span class="theme-icon light-icon" aria-hidden="true">☀️</span>
+          <span class="theme-icon dark-icon" aria-hidden="true">🌙</span>
+        </button>
+        <button id="hamburgerBtn" class="hamburger-btn" aria-label="Open Navigation Menu" aria-expanded="false" aria-controls="navMenu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= GLOBAL DISCLAIMER BADGE ================= -->
+  <div class="demo-banner">
+    <div class="container banner-content">
+      <span class="pulse-dot"></span>
+      <span class="banner-text"><strong>Simulation / Demonstration Project:</strong> All metrics, waveforms, and power distributions are numerically modeled for academic evaluation.</span>
+    </div>
+  </div>
+
+  <main>
+    <!-- ================= PAGE 1: HOME / HERO ================= -->
+    <section class="hero-section" id="home">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <div class="project-badge">
+            <span class="badge-icon">⚡</span>
+            <span>Simulation / Demonstration Project</span>
+          </div>
+          <h1 class="hero-title">Powering Tomorrow with <span class="gradient-text">Hybrid Renewable Energy</span></h1>
+          <p class="hero-subtitle">
+            Explore how solar and wind energy can work together with battery storage to meet electrical demand.
+            A real-time simulated microgrid illustrating power generation, energy dispatch, and storage dynamics.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#dashboard" class="btn btn-primary">
+              <span class="btn-icon">📊</span>
+              <span>Explore Dashboard</span>
+            </a>
+            <a href="#calculator" class="btn btn-secondary">
+              <span class="btn-icon">🧮</span>
+              <span>Calculate Energy</span>
+            </a>
+          </div>
+
+          <!-- Live Snapshot Ticker -->
+          <div class="hero-quick-stats">
+            <div class="quick-stat">
+              <span class="qs-label">Total Gen</span>
+              <span class="qs-value" id="heroTotalGen">7.0 kW</span>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="quick-stat">
+              <span class="qs-label">Load</span>
+              <span class="qs-value" id="heroLoad">5.1 kW</span>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="quick-stat">
+              <span class="qs-label">Battery SOC</span>
+              <span class="qs-value" id="heroBattery">76%</span>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="quick-stat">
+              <span class="qs-label">Status</span>
+              <span class="qs-badge charging" id="heroStatusBadge">CHARGING</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Hero Microgrid Illustration -->
+        <div class="hero-visual">
+          <div class="hero-diagram-card">
+            <div class="diagram-header">
+              <span class="diagram-tag">HYBRID SYSTEM TOPOLOGY</span>
+              <span class="diagram-status"><span class="pulse-dot green"></span> Running</span>
+            </div>
+            <div class="microgrid-schematic">
+              <!-- Solar Node -->
+              <div class="schematic-node node-solar">
+                <div class="node-icon-box">
+                  <img src="assets/solar.svg" alt="Solar Panels" class="schematic-icon">
+                </div>
+                <div class="node-info">
+                  <span class="node-name">☀️ Solar PV</span>
+                  <span class="node-val" id="heroSolarVal">4.2 kW</span>
+                </div>
+                <div class="flow-arrow down" title="Power output to bus">⚡</div>
+              </div>
+
+              <!-- Wind Node -->
+              <div class="schematic-node node-wind">
+                <div class="node-icon-box">
+                  <img src="assets/wind.svg" alt="Wind Turbine" class="schematic-icon spin-slow">
+                </div>
+                <div class="node-info">
+                  <span class="node-name">🌬️ Wind Turbine</span>
+                  <span class="node-val" id="heroWindVal">2.8 kW</span>
+                </div>
+                <div class="flow-arrow right" title="Power output to bus">⚡</div>
+              </div>
+
+              <!-- Center Bus / Controller -->
+              <div class="schematic-node node-controller">
+                <div class="controller-core">
+                  <img src="assets/renewable-energy.svg" alt="Energy Manager" class="core-icon">
+                  <span class="core-title">ENERGY MANAGEMENT SYSTEM (EMS)</span>
+                  <span class="core-sub" id="heroNetFlow">+1.9 kW Surplus</span>
+                </div>
+              </div>
+
+              <!-- Battery Node -->
+              <div class="schematic-node node-battery">
+                <div class="node-icon-box">
+                  <img src="assets/battery.svg" alt="Battery Storage" class="schematic-icon">
+                </div>
+                <div class="node-info">
+                  <span class="node-name">🔋 Battery Storage</span>
+                  <span class="node-val" id="heroBatVal">76% (Charging)</span>
+                </div>
+                <div class="flow-arrow up-down" id="heroBatArrow">▲ Charging</div>
+              </div>
+
+              <!-- Load Node -->
+              <div class="schematic-node node-load">
+                <div class="node-icon-box load-box">
+                  <span class="load-icon-emoji">🏠</span>
+                </div>
+                <div class="node-info">
+                  <span class="node-name">🏠 Electrical Load</span>
+                  <span class="node-val" id="heroLoadVal">5.1 kW</span>
+                </div>
+                <div class="flow-arrow right">⚡</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Cards Section -->
+      <div class="container feature-cards-wrapper">
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon-container solar-accent">
+              <img src="assets/solar.svg" alt="Solar PV Icon">
+            </div>
+            <h3 class="feature-title">Solar Energy</h3>
+            <p class="feature-desc">Clean electricity generated from photovoltaic panels, utilizing semiconductor solar cells to convert sunlight directly into DC electrical energy.</p>
+            <div class="feature-meta">
+              <span>Daytime Peak</span>
+              <span class="meta-tag">MPPT Regulated</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-container wind-accent">
+              <img src="assets/wind.svg" alt="Wind Turbine Icon">
+            </div>
+            <h3 class="feature-title">Wind Energy</h3>
+            <p class="feature-desc">Electricity generated using wind turbine systems, capturing atmospheric kinetic energy with aerodynamic rotor blades coupled to an induction generator.</p>
+            <div class="feature-meta">
+              <span>Continuous / Nocturnal</span>
+              <span class="meta-tag">Aerodynamic Cp</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-container battery-accent">
+              <img src="assets/battery.svg" alt="Battery Storage Icon">
+            </div>
+            <h3 class="feature-title">Energy Storage</h3>
+            <p class="feature-desc">Battery storage helps balance renewable generation and demand, absorbing surplus generation during peaks and discharging instantaneously during lulls.</p>
+            <div class="feature-meta">
+              <span>Bi-directional BESS</span>
+              <span class="meta-tag">20%–100% SOC Guard</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 2: DASHBOARD ================= -->
+    <section class="dashboard-section section-padding" id="dashboard">
+      <div class="container">
+        <!-- Section Title & Simulation Control Bar -->
+        <div class="section-header-flex">
+          <div>
+            <div class="section-badge">
+              <span class="pulse-dot green"></span>
+              <span>LIVE SIMULATION</span>
+            </div>
+            <h2 class="section-title">System Overview Dashboard</h2>
+            <p class="section-subtitle">Real-time parameters, generation telemetry, and power balance of the hybrid microgrid.</p>
+          </div>
+
+          <!-- Simulation Controls -->
+          <div class="sim-control-panel" role="toolbar" aria-label="Simulation Controls">
+            <div class="sim-status-indicator">
+              <span class="sim-dot active" id="simDot"></span>
+              <span class="sim-state-text" id="simStatusText">Running (1x)</span>
+            </div>
+            <div class="sim-button-group">
+              <button id="simPauseBtn" class="sim-btn" title="Pause / Resume simulation" aria-label="Pause or Resume Simulation">
+                <span id="simPauseIcon">⏸️</span>
+                <span id="simPauseLabel">Pause</span>
+              </button>
+              <button id="simSpeedBtn" class="sim-btn" title="Cycle simulation speed (1x, 2x, 5x)" aria-label="Simulation Speed">
+                <span id="simSpeedLabel">1x</span>
+              </button>
+              <div class="dropdown-container">
+                <button id="simPresetBtn" class="sim-btn dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                  <span>Presets ▾</span>
+                </button>
+                <div class="dropdown-menu" id="simPresetMenu">
+                  <button class="dropdown-item" data-preset="noon-peak">☀️ Peak Noon Solar (High Solar, Normal Wind)</button>
+                  <button class="dropdown-item" data-preset="stormy-wind">🌬️ High Wind Event (High Wind, Overcast)</button>
+                  <button class="dropdown-item" data-preset="evening-load">🏠 Evening Peak Demand (High Load, Battery Discharging)</button>
+                  <button class="dropdown-item" data-preset="night-calm">🌙 Night Calm (Zero Solar, Low Wind, Deep Discharge)</button>
+                  <button class="dropdown-item" data-preset="balanced">⚖️ Default Balanced Profile</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 KPI CARDS -->
+        <div class="kpi-grid">
+          <!-- Solar Power KPI -->
+          <div class="kpi-card" id="kpiSolar">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap solar">
+                <img src="assets/solar.svg" alt="Solar Icon">
+              </div>
+              <span class="kpi-status-tag" id="solarStatusTag">Optimum</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Solar Power</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiSolarVal">4.2</span>
+                <span class="kpi-unit">kW</span>
+              </div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-subtext">Irradiance: <strong id="kpiSolarIrr">850</strong> W/m²</span>
+              <div class="mini-trend-bar">
+                <div class="bar-fill solar" id="solarTrendBar" style="width: 70%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wind Power KPI -->
+          <div class="kpi-card" id="kpiWind">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap wind">
+                <img src="assets/wind.svg" alt="Wind Icon">
+              </div>
+              <span class="kpi-status-tag" id="windStatusTag">Generating</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Wind Power</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiWindVal">2.8</span>
+                <span class="kpi-unit">kW</span>
+              </div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-subtext">Wind Speed: <strong id="kpiWindSpd">7.2</strong> m/s</span>
+              <div class="mini-trend-bar">
+                <div class="bar-fill wind" id="windTrendBar" style="width: 56%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Renewable Power KPI -->
+          <div class="kpi-card highlight-green" id="kpiRenewable">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap renewable">
+                <img src="assets/renewable-energy.svg" alt="Total Renewable Icon">
+              </div>
+              <span class="kpi-status-tag green" id="renewStatusTag">Active Mix</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Total Renewable Power</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiTotalRenewableVal">7.0</span>
+                <span class="kpi-unit">kW</span>
+              </div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-subtext">Solar + Wind Aggregated</span>
+              <div class="mini-trend-bar">
+                <div class="bar-fill green" id="renewTrendBar" style="width: 78%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Load Demand KPI -->
+          <div class="kpi-card" id="kpiLoad">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap load">
+                <span class="load-card-icon">🏠</span>
+              </div>
+              <span class="kpi-status-tag" id="loadStatusTag">Normal</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Load Demand</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiLoadVal">5.1</span>
+                <span class="kpi-unit">kW</span>
+              </div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-subtext">Net Balance: <strong id="kpiNetBal">+1.9 kW</strong></span>
+              <div class="mini-trend-bar">
+                <div class="bar-fill load" id="loadTrendBar" style="width: 62%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Battery SOC KPI -->
+          <div class="kpi-card" id="kpiBattery">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap battery">
+                <img src="assets/battery.svg" alt="Battery Icon">
+              </div>
+              <span class="kpi-status-tag charging" id="kpiBatStatusTag">Charging</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Battery SOC</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiBatSOCVal">76</span>
+                <span class="kpi-unit">%</span>
+              </div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-subtext">Voltage: <strong id="kpiBatVolt">48.6</strong> V</span>
+              <div class="mini-trend-bar">
+                <div class="bar-fill battery" id="batTrendBar" style="width: 76%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CO2 Avoided KPI -->
+          <div class="kpi-card highlight-cyan" id="kpiCO2">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap co2">
+                <span class="eco-leaf-icon">🌱</span>
+              </div>
+              <span class="kpi-status-tag cyan">Offset</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">CO₂ Avoided</span>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiCO2Val">18.4</span>
+                <span class="kpi-unit">kg</span>
+              </div>
+            </div>
+            <div class="kpi-footer">
+              <span class="kpi-subtext" title="Assumed grid factor: 0.82 kg CO2 per kWh">Grid Factor: 0.82 kg/kWh</span>
+              <div class="mini-trend-bar">
+                <div class="bar-fill cyan" style="width: 65%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= ENERGY FLOW VISUALIZATION ================= -->
+        <div class="flow-diagram-container">
+          <div class="flow-card-header">
+            <div>
+              <h3 class="flow-card-title">Central Energy Flow & Dispatch Simulation</h3>
+              <p class="flow-card-desc">Animated vector visualization of microgrid energy routing. Dashed tracks dynamically indicate flow magnitude and direction.</p>
+            </div>
+            <div class="flow-legend">
+              <span class="legend-item"><span class="legend-dot solar"></span> Solar Inflow</span>
+              <span class="legend-item"><span class="legend-dot wind"></span> Wind Inflow</span>
+              <span class="legend-item"><span class="legend-dot load"></span> Load Consumption</span>
+              <span class="legend-item"><span class="legend-dot battery"></span> BESS Transfer</span>
+            </div>
+          </div>
+
+          <div class="flow-canvas-wrapper">
+            <!-- Dynamic SVG Vector Flow Diagram -->
+            <svg class="flow-svg" viewBox="0 0 960 480" preserveAspectRatio="xMidYMid meet" id="energyFlowSvg" aria-label="Animated Energy Flow Schematic">
+              <defs>
+                <!-- Glow Filters -->
+                <filter id="svgFlowGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+                
+                <!-- Markers for flow arrows -->
+                <marker id="arrowSolar" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L6,3 z" fill="#F59E0B" />
+                </marker>
+                <marker id="arrowWind" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L6,3 z" fill="#06B6D4" />
+                </marker>
+                <marker id="arrowLoad" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L6,3 z" fill="#EC4899" />
+                </marker>
+                <marker id="arrowBatteryDown" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L6,3 z" fill="#10B981" />
+                </marker>
+                <marker id="arrowBatteryUp" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L6,3 z" fill="#F59E0B" />
+                </marker>
+              </defs>
+
+              <!-- Connection Pipelines (Background Track) -->
+              <!-- Solar to Center: (200, 110) -> (480, 220) -->
+              <path d="M 220 110 L 480 110 L 480 170" class="pipe-track" />
+              <!-- Wind to Center: (150, 240) -> (410, 240) -->
+              <path d="M 220 240 L 410 240" class="pipe-track" />
+              <!-- Center to Load: (550, 240) -> (760, 240) -->
+              <path d="M 550 240 L 760 240" class="pipe-track" />
+              <!-- Center to Battery: (480, 310) -> (480, 390) -->
+              <path d="M 480 310 L 480 390" class="pipe-track" />
+
+              <!-- Active Animated Pulse Paths -->
+              <!-- 1. Solar Pulse -->
+              <path d="M 220 110 L 480 110 L 480 170" class="flow-line solar-flow active" id="flowSolarPath" marker-end="url(#arrowSolar)" />
+              
+              <!-- 2. Wind Pulse -->
+              <path d="M 220 240 L 410 240" class="flow-line wind-flow active" id="flowWindPath" marker-end="url(#arrowWind)" />
+              
+              <!-- 3. Load Pulse -->
+              <path d="M 550 240 L 760 240" class="flow-line load-flow active" id="flowLoadPath" marker-end="url(#arrowLoad)" />
+              
+              <!-- 4. Battery Bi-directional Pulse -->
+              <path d="M 480 310 L 480 390" class="flow-line battery-flow-charge active" id="flowBatteryPath" marker-end="url(#arrowBatteryDown)" />
+
+              <!-- Flow Node 1: Solar Panel -->
+              <g class="flow-node-group" transform="translate(110, 60)">
+                <rect width="120" height="100" rx="14" class="node-box" />
+                <image href="assets/solar.svg" x="38" y="12" width="44" height="44" />
+                <text x="60" y="70" class="node-title">☀️ SOLAR PV</text>
+                <text x="60" y="88" class="node-power solar-text" id="flowSolarText">4.2 kW</text>
+              </g>
+
+              <!-- Flow Node 2: Wind Turbine -->
+              <g class="flow-node-group" transform="translate(110, 190)">
+                <rect width="120" height="100" rx="14" class="node-box" />
+                <image href="assets/wind.svg" x="38" y="12" width="44" height="44" />
+                <text x="60" y="70" class="node-title">🌬️ WIND</text>
+                <text x="60" y="88" class="node-power wind-text" id="flowWindText">2.8 kW</text>
+              </g>
+
+              <!-- Center Hub: Energy Management System (EMS) -->
+              <g class="flow-node-group ems-hub" transform="translate(410, 170)">
+                <rect width="140" height="140" rx="20" class="hub-box" filter="url(#svgFlowGlow)" />
+                <circle cx="70" cy="52" r="28" class="hub-inner-circle" />
+                <image href="assets/renewable-energy.svg" x="48" y="30" width="44" height="44" />
+                <text x="70" y="96" class="hub-title">ENERGY</text>
+                <text x="70" y="110" class="hub-title">MANAGEMENT</text>
+                <text x="70" y="128" class="hub-status-text" id="flowEmsStatus">+1.9 kW Excess</text>
+              </g>
+
+              <!-- Flow Node 3: Electrical Load -->
+              <g class="flow-node-group" transform="translate(750, 190)">
+                <rect width="120" height="100" rx="14" class="node-box" />
+                <text x="60" y="44" class="node-icon-emoji">🏠</text>
+                <text x="60" y="70" class="node-title">LOAD</text>
+                <text x="60" y="88" class="node-power load-text" id="flowLoadText">5.1 kW</text>
+              </g>
+
+              <!-- Flow Node 4: Battery Storage -->
+              <g class="flow-node-group" transform="translate(420, 380)">
+                <rect width="120" height="90" rx="14" class="node-box" />
+                <image href="assets/battery.svg" x="42" y="10" width="36" height="36" />
+                <text x="60" y="58" class="node-title">🔋 BATTERY</text>
+                <text x="60" y="76" class="node-power bat-text" id="flowBatText">76% (1.9 kW)</text>
+              </g>
+
+              <!-- Dynamic Interactive Flow Labels On Connecting Paths -->
+              <!-- Solar Path Label -->
+              <rect x="300" y="96" width="90" height="26" rx="6" class="pipe-label-bg" />
+              <text x="345" y="113" class="pipe-label-text solar-text" id="pipeSolarLabel">4.2 kW In</text>
+
+              <!-- Wind Path Label -->
+              <rect x="255" y="227" width="90" height="26" rx="6" class="pipe-label-bg" />
+              <text x="300" y="244" class="pipe-label-text wind-text" id="pipeWindLabel">2.8 kW In</text>
+
+              <!-- Load Path Label -->
+              <rect x="620" y="227" width="90" height="26" rx="6" class="pipe-label-bg" />
+              <text x="665" y="244" class="pipe-label-text load-text" id="pipeLoadLabel">5.1 kW Out</text>
+
+              <!-- Battery Branch Label -->
+              <rect x="495" y="336" width="115" height="26" rx="6" class="pipe-label-bg" />
+              <text x="552" y="353" class="pipe-label-text bat-text" id="pipeBatLabel">▼ 1.9 kW Chg</text>
+            </svg>
+          </div>
+
+          <!-- Logic Explanation Alert Bar -->
+          <div class="flow-logic-banner" id="flowLogicBanner">
+            <div class="logic-icon" id="flowLogicIcon">⚡</div>
+            <div class="logic-content">
+              <strong id="flowLogicTitle">Renewable Surplus Condition (P_gen &gt; P_load):</strong>
+              <span id="flowLogicDesc">Total generation (7.0 kW) exceeds customer load demand (5.1 kW). The net surplus of 1.9 kW is currently routed to charge the BESS battery storage system.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 3: SOLAR ENERGY ================= -->
+    <section class="solar-section section-padding alt-bg" id="solar">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge solar-badge">
+            <span>☀️ PHOTOVOLTAIC TELEMETRY</span>
+          </div>
+          <h2 class="section-title">Solar PV Generation & Characterization</h2>
+          <p class="section-subtitle">Real-time solar irradiance, string DC voltage/current measurements, and diurnal generation curves.</p>
+        </div>
+
+        <div class="two-col-grid">
+          <!-- Solar Metrics & Illustration -->
+          <div class="solar-metrics-panel">
+            <div class="tech-card">
+              <div class="tech-card-header">
+                <h3 class="card-heading">PV Array Instantaneous Operating Points</h3>
+                <span class="live-tag">STC Reference</span>
+              </div>
+
+              <!-- Live Solar Measurement Tiles -->
+              <div class="measurement-grid">
+                <div class="measure-tile">
+                  <span class="m-label">Solar Irradiance (G)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="solarIrrVal">850</span>
+                    <span class="m-unit">W/m²</span>
+                  </div>
+                  <span class="m-hint">Clear Sky Peak: ~1000 W/m²</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">PV Array DC Voltage (V_pv)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="solarVoltVal">360</span>
+                    <span class="m-unit">V</span>
+                  </div>
+                  <span class="m-hint">MPPT Operating Voltage</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">PV Array DC Current (I_pv)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="solarCurrVal">11.7</span>
+                    <span class="m-unit">A</span>
+                  </div>
+                  <span class="m-hint">Photocurrent Output</span>
+                </div>
+
+                <div class="measure-tile highlight-solar">
+                  <span class="m-label">Solar DC Power (P_solar)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="solarPowerCalculated">4.21</span>
+                    <span class="m-unit">kW</span>
+                  </div>
+                  <span class="m-hint">Formula: P = V × I</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Daily Cumulative Energy</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="solarDailyEnergy">27.4</span>
+                    <span class="m-unit">kWh</span>
+                  </div>
+                  <span class="m-hint">Integral: ∫ P dt</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Module Efficiency (η)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val">18.5</span>
+                    <span class="m-unit">%</span>
+                  </div>
+                  <span class="m-hint">Monocrystalline Silicon</span>
+                </div>
+              </div>
+
+              <!-- Solar Panel Physical Illustration Card -->
+              <div class="panel-visual-card">
+                <div class="panel-svg-holder">
+                  <img src="assets/solar.svg" alt="Solar Array Illustration" class="panel-illustration">
+                </div>
+                <div class="panel-visual-details">
+                  <h4>Photovoltaic Array Specifications</h4>
+                  <ul>
+                    <li><strong>Cell Technology:</strong> Monocrystalline Silicon (c-Si)</li>
+                    <li><strong>Array Configuration:</strong> 2 Strings of 10 Modules (Series-Parallel)</li>
+                    <li><strong>Nominal Rating:</strong> 5.0 kWp at STC (1000 W/m², 25°C)</li>
+                    <li><strong>Inverter MPPT Efficiency:</strong> 98.2%</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- EEE Concept Card -->
+            <div class="concept-card">
+              <div class="concept-header">
+                <span class="concept-icon">📐</span>
+                <h4>Engineering Fundamentals: Photovoltaic Power</h4>
+              </div>
+              <div class="formula-box">
+                <code>P_solar = V_pv × I_pv</code>
+                <p class="formula-desc">DC electrical power equals the product of instantaneous array voltage and current, optimized by Maximum Power Point Tracking (MPPT) algorithms (Perturb & Observe).</p>
+              </div>
+              <div class="concept-bullet-list">
+                <p><strong>• Solar Irradiance:</strong> The radiant flux density received per unit area from the sun, quantified in W/m².</p>
+                <p><strong>• Solar PV Panel:</strong> Solid-state semiconductor p-n junctions converting photon energy into electron-hole pairs via the photoelectric effect.</p>
+                <p><strong>• Solar Efficiency:</strong> The ratio of electrical power output to incident solar radiant power: \(\eta = \frac{P_{max}}{A \times G} \times 100\%\).</p>
+                <p><strong>• Daily Energy Yield:</strong> Time-integrated total power generation over the 24-hour diurnal cycle (kWh).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Solar Diurnal Chart -->
+          <div class="solar-chart-panel">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h3 class="card-heading">Solar Power Generation Throughout the Day</h3>
+                  <p class="chart-subheading">Simulated diurnal Bell-curve profile under typical clear-sky solar insolation.</p>
+                </div>
+                <span class="time-range-badge">06:00 – 18:00</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="solarDailyChart" aria-label="Solar Daily Generation Chart" role="img"></canvas>
+              </div>
+              <!-- Tabular Sample Reference Data -->
+              <div class="sample-data-table-wrap">
+                <table class="sample-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>06:00</th>
+                      <th>08:00</th>
+                      <th>10:00</th>
+                      <th>12:00</th>
+                      <th>14:00</th>
+                      <th>16:00</th>
+                      <th>18:00</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Power</strong></td>
+                      <td>0.2 kW</td>
+                      <td>1.1 kW</td>
+                      <td>3.0 kW</td>
+                      <td>4.5 kW</td>
+                      <td>4.0 kW</td>
+                      <td>2.2 kW</td>
+                      <td>0.3 kW</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 4: WIND ENERGY ================= -->
+    <section class="wind-section section-padding" id="wind">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge wind-badge">
+            <span>🌬️ WIND TURBINE AERODYNAMICS</span>
+          </div>
+          <h2 class="section-title">Wind Turbine Generation & Dynamics</h2>
+          <p class="section-subtitle">Real-time wind velocity, turbine rotor rotational speed, and kinetic conversion modeling.</p>
+        </div>
+
+        <div class="two-col-grid">
+          <!-- Wind Turbine Animated SVG Visual & Controls -->
+          <div class="wind-visual-panel">
+            <div class="tech-card">
+              <div class="tech-card-header">
+                <h3 class="card-heading">Aerodynamic Rotor & Generator Telemetry</h3>
+                <span class="live-tag cyan">Active Yaw</span>
+              </div>
+
+              <!-- Dynamic Interactive Wind Turbine Graphic -->
+              <div class="wind-turbine-stage">
+                <div class="wind-gust-lines">
+                  <div class="gust gust-1"></div>
+                  <div class="gust gust-2"></div>
+                  <div class="gust gust-3"></div>
+                </div>
+
+                <div class="turbine-assembly">
+                  <!-- Animated Rotor Blades (CSS dynamic speed) -->
+                  <div class="rotor-blades-hub" id="rotorHub">
+                    <div class="blade blade-1"></div>
+                    <div class="blade blade-2"></div>
+                    <div class="blade blade-3"></div>
+                    <div class="hub-cap"></div>
+                  </div>
+                  <!-- Nacelle -->
+                  <div class="turbine-nacelle"></div>
+                  <!-- Tower -->
+                  <div class="turbine-tower"></div>
+                  <!-- Foundation -->
+                  <div class="turbine-base"></div>
+                </div>
+
+                <div class="turbine-dynamic-tag">
+                  <span id="turbineDynamicRpm">420 RPM</span>
+                  <small id="turbineDynamicStatus">Generating</small>
+                </div>
+              </div>
+
+              <!-- Measurement Grid -->
+              <div class="measurement-grid">
+                <div class="measure-tile">
+                  <span class="m-label">Wind Velocity (V)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="windSpeedVal">7.2</span>
+                    <span class="m-unit">m/s</span>
+                  </div>
+                  <span class="m-hint">Rated Speed: 11 m/s</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Rotor Speed (ω)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="windRpmVal">420</span>
+                    <span class="m-unit">RPM</span>
+                  </div>
+                  <span class="m-hint">Coupled to Gearbox</span>
+                </div>
+
+                <div class="measure-tile highlight-wind">
+                  <span class="m-label">Wind Power Output (P_wind)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="windPowerCalculated">2.80</span>
+                    <span class="m-unit">kW</span>
+                  </div>
+                  <span class="m-hint">Formula: P = ½ρACpV³</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Daily Cumulative Energy</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="windDailyEnergy">11.2</span>
+                    <span class="m-unit">kWh</span>
+                  </div>
+                  <span class="m-hint">Integral: ∫ P dt</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Turbine Operational State</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val text-green" id="windStateVal">Generating</span>
+                  </div>
+                  <span class="m-hint">Cut-in: 3.0 m/s | Cut-out: 25 m/s</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Power Coefficient (Cp)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val">0.42</span>
+                    <span class="m-unit">(42%)</span>
+                  </div>
+                  <span class="m-hint">Betz Limit Max: 59.3%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- EEE Wind Concept Card -->
+            <div class="concept-card">
+              <div class="concept-header">
+                <span class="concept-icon">🌬️</span>
+                <h4>Engineering Fundamentals: Wind Aerodynamics</h4>
+              </div>
+              <div class="formula-box">
+                <code>P = ½ · ρ · A · C_p · V³</code>
+                <p class="formula-desc">Power extracted from moving air is cubic with respect to wind velocity, making location wind speed the most decisive factor in annual yield.</p>
+              </div>
+              <div class="concept-bullet-list">
+                <p><strong>• \(\rho\) (Air Density):</strong> Mass per unit volume of air, typically \(1.225 \text{ kg/m}^3\) at standard sea-level temperature and pressure.</p>
+                <p><strong>• A (Swept Area):</strong> Total circular area spanned by the rotating turbine blades: \(A = \pi R^2\).</p>
+                <p><strong>• C_p (Power Coefficient):</strong> Betz aerodynamic efficiency factor, theoretically capped at Betz’s limit of \(16/27 \approx 59.3\%\).</p>
+                <p><strong>• V (Wind Speed):</strong> Upstream velocity. Because \(P \propto V^3\), doubling the wind speed increases theoretical available kinetic power by \(8\times\)!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wind Diurnal / Daily Variation Chart -->
+          <div class="wind-chart-panel">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h3 class="card-heading">Wind Power Generation Throughout the Day</h3>
+                  <p class="chart-subheading">Simulated hourly generation exhibiting natural stochastic variations and nocturnal gusts.</p>
+                </div>
+                <span class="time-range-badge cyan">24-Hour Cycle</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="windDailyChart" aria-label="Wind Daily Generation Chart" role="img"></canvas>
+              </div>
+              <div class="chart-annotation-card">
+                <div class="annotation-icon">💡</div>
+                <div class="annotation-text">
+                  <strong>Complementary Renewable Property:</strong> Notice how wind generation often remains active or intensifies during evening and early morning hours when solar insolation is zero. This complementary dynamic minimizes storage discharge cycles and reduces microgrid diesel/grid dependence.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 5: BATTERY STORAGE ================= -->
+    <section class="battery-section section-padding alt-bg" id="battery">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge battery-badge">
+            <span>🔋 BESS MANAGEMENT</span>
+          </div>
+          <h2 class="section-title">Battery Energy Storage System (BESS)</h2>
+          <p class="section-subtitle">Real-time State of Charge (SOC), voltage characteristics, thermal monitoring, and dispatch protection.</p>
+        </div>
+
+        <div class="two-col-grid">
+          <!-- Large Interactive Battery Visualization -->
+          <div class="battery-visual-panel">
+            <div class="tech-card">
+              <div class="tech-card-header">
+                <h3 class="card-heading">Li-Ion BESS Operational Enclosure</h3>
+                <span class="live-tag green" id="bessModeTag">CHARGING</span>
+              </div>
+
+              <!-- Main Battery Visual -->
+              <div class="battery-stage">
+                <!-- Large CSS Animated Battery Cell -->
+                <div class="battery-cell-enclosure">
+                  <div class="battery-terminal-top"></div>
+                  <div class="battery-inner-chassis">
+                    <!-- Dynamic Liquid Fill -->
+                    <div class="battery-liquid-fill" id="batteryFillBar" style="height: 76%;">
+                      <div class="liquid-wave"></div>
+                      <div class="liquid-particles"></div>
+                    </div>
+                    <!-- Big SOC Readout -->
+                    <div class="battery-soc-overlay">
+                      <span class="soc-large-number" id="batMainSOC">76%</span>
+                      <span class="soc-status-label" id="batMainStatus">CHARGING (+1.9 kW)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Circular SOC Gauge -->
+                <div class="battery-radial-stats">
+                  <div class="radial-gauge-container">
+                    <svg class="radial-svg" viewBox="0 0 120 120">
+                      <circle cx="60" cy="60" r="50" class="radial-bg-track" />
+                      <circle cx="60" cy="60" r="50" class="radial-fill-track" id="radialFillCircle" stroke-dasharray="314" stroke-dashoffset="75" />
+                    </svg>
+                    <div class="radial-inner-label">
+                      <span class="radial-pct" id="radialBatPct">76%</span>
+                      <span class="radial-sub">SOC</span>
+                    </div>
+                  </div>
+                  <div class="soc-limits-legend">
+                    <div class="limit-row">
+                      <span class="limit-dot red"></span>
+                      <span>Min Cutoff: <strong>20% SOC</strong></span>
+                    </div>
+                    <div class="limit-row">
+                      <span class="limit-dot green"></span>
+                      <span>Max Cutoff: <strong>100% SOC</strong></span>
+                    </div>
+                    <div class="limit-row">
+                      <span class="limit-dot cyan"></span>
+                      <span>Usable Cap: <strong>8.0 kWh</strong></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Battery Measurement Grid -->
+              <div class="measurement-grid">
+                <div class="measure-tile">
+                  <span class="m-label">Terminal Voltage (V_bat)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="batVoltVal">48.6</span>
+                    <span class="m-unit">V</span>
+                  </div>
+                  <span class="m-hint">Nominal 48V Bus</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Battery Current (I_bat)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="batCurrVal">+8.2</span>
+                    <span class="m-unit">A</span>
+                  </div>
+                  <span class="m-hint">(+) Charge / (-) Discharge</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Cell Temperature</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val" id="batTempVal">31</span>
+                    <span class="m-unit">°C</span>
+                  </div>
+                  <span class="m-hint">Safe Band: 15°C – 45°C</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Nominal Storage Capacity</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val">10.0</span>
+                    <span class="m-unit">kWh</span>
+                  </div>
+                  <span class="m-hint">LiFePO4 Chemistry</span>
+                </div>
+
+                <div class="measure-tile highlight-green">
+                  <span class="m-label">BESS Operating State</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val text-green" id="batStateText">CHARGING</span>
+                  </div>
+                  <span class="m-hint" id="batStateSub">Absorbing Surplus Generation</span>
+                </div>
+
+                <div class="measure-tile">
+                  <span class="m-label">Round-Trip Efficiency (RTE)</span>
+                  <div class="m-val-wrap">
+                    <span class="m-val">92.5</span>
+                    <span class="m-unit">%</span>
+                  </div>
+                  <span class="m-hint">Bi-directional Inverter & Cell</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- EEE Concept Card -->
+            <div class="concept-card">
+              <div class="concept-header">
+                <span class="concept-icon">⚖️</span>
+                <h4>Energy Management & Dispatch Logic</h4>
+              </div>
+              <div class="logic-code-snippet">
+                <pre><code>// 1. Sum instantaneous renewable generation:
+renewablePower = solarPower + windPower;
+
+// 2. Determine microgrid net power balance:
+if (renewablePower &gt; loadDemand) {
+    excessPower = renewablePower - loadDemand;
+    if (batterySOC &lt; 100) {
+        batteryMode = "CHARGING";
+        batterySOC += (excessPower * timeStep / batteryCapacity) * 100;
+    } else {
+        batteryMode = "FULL_FLOAT";
+    }
+} else if (renewablePower &lt; loadDemand) {
+    requiredPower = loadDemand - renewablePower;
+    if (batterySOC &gt; 20) {
+        batteryMode = "DISCHARGING";
+        batterySOC -= (requiredPower * timeStep / batteryCapacity) * 100;
+    } else {
+        batteryMode = "LOW_BATTERY_SHED";
+    }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Battery SOC Throughout Day Chart -->
+          <div class="battery-chart-panel">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h3 class="card-heading">Battery SOC Throughout the Day</h3>
+                  <p class="chart-subheading">24-hour state of charge trajectory showing daytime absorption and evening supply.</p>
+                </div>
+                <span class="time-range-badge green">SOC % (20%–100%)</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="batteryDailyChart" aria-label="Battery Daily SOC Chart" role="img"></canvas>
+              </div>
+              <!-- Battery Health & Protection Notes -->
+              <div class="battery-safety-notes">
+                <div class="safety-item">
+                  <span class="safety-badge">DOD Guard</span>
+                  <p><strong>Minimum 20% SOC Limit:</strong> Prevents deep discharge and irreversible lithium plating, preserving cycle life (&gt;4,000 cycles).</p>
+                </div>
+                <div class="safety-item">
+                  <span class="safety-badge green">OVP Guard</span>
+                  <p><strong>Maximum 100% SOC Limit:</strong> Cutoff stops overcharging and thermal runaway, throttling charge current at saturation.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 6: ANALYTICS ================= -->
+    <section class="analytics-section section-padding" id="analytics">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge analytics-badge">
+            <span>📈 COMPREHENSIVE PERFORMANCE</span>
+          </div>
+          <h2 class="section-title">Microgrid Analytics & Comparative Profiles</h2>
+          <p class="section-subtitle">Multi-parameter correlation, generation vs. demand profiles, and live-calculated renewable fraction.</p>
+        </div>
+
+        <!-- 4 ANALYTICS CHARTS GRID -->
+        <div class="analytics-charts-grid">
+          <!-- Chart 1: Solar vs Wind Generation -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="card-heading">Chart 1: Solar vs Wind Generation</h3>
+                <p class="chart-subheading">Comparative hourly profiles displaying daytime solar peak and nocturnal wind persistence.</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="chartSolarVsWind" aria-label="Solar vs Wind Generation Comparison Chart" role="img"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 2: Renewable Generation vs Load -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="card-heading">Chart 2: Renewable Generation vs Load Demand</h3>
+                <p class="chart-subheading">Green area denotes generation surplus (battery charging); Red deficit area triggers discharge.</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="chartGenVsLoad" aria-label="Renewable Generation vs Load Demand Chart" role="img"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 3: Battery State of Charge -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="card-heading">Chart 3: Battery State of Charge (SOC %)</h3>
+                <p class="chart-subheading">Continuously tracking battery energy reserve within safe 20%–100% operational window.</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="chartBatterySOC" aria-label="Battery State of Charge Chart" role="img"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 4: Daily Renewable Energy Breakdown -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="card-heading">Chart 4: Daily Renewable Energy Contribution</h3>
+                <p class="chart-subheading">Comparative energy share (kWh) supplied by Solar PV vs Wind Turbine vs Storage.</p>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="chartDailyBreakdown" aria-label="Daily Renewable Energy Breakdown Chart" role="img"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Statistics Cards (Calculated dynamically by JS) -->
+        <div class="summary-stats-container">
+          <div class="summary-header">
+            <h3>Calculated Microgrid Summary Performance (24-Hour Cumulative)</h3>
+            <span class="calc-tag">Computed via JavaScript</span>
+          </div>
+          <div class="summary-stats-grid">
+            <div class="summary-stat-box">
+              <span class="stat-label">Total Renewable Generation</span>
+              <span class="stat-number" id="sumTotalRenewable">38.6 kWh</span>
+              <span class="stat-sub">Solar (27.4) + Wind (11.2)</span>
+            </div>
+
+            <div class="summary-stat-box">
+              <span class="stat-label">Solar Contribution</span>
+              <span class="stat-number text-solar" id="sumSolarContrib">71.0%</span>
+              <span class="stat-sub">27.4 kWh Produced</span>
+            </div>
+
+            <div class="summary-stat-box">
+              <span class="stat-label">Wind Contribution</span>
+              <span class="stat-number text-wind" id="sumWindContrib">29.0%</span>
+              <span class="stat-sub">11.2 kWh Produced</span>
+            </div>
+
+            <div class="summary-stat-box">
+              <span class="stat-label">Battery Cycling Throughput</span>
+              <span class="stat-number text-green" id="sumBatUsage">8.4 kWh</span>
+              <span class="stat-sub">1.05 Equivalent Cycles</span>
+            </div>
+
+            <div class="summary-stat-box">
+              <span class="stat-label">Total Load Demand</span>
+              <span class="stat-number text-rose" id="sumLoadDemand">34.8 kWh</span>
+              <span class="stat-sub">Cumulative Household Demand</span>
+            </div>
+
+            <div class="summary-stat-box highlight-box">
+              <span class="stat-label">Renewable Fraction / Contribution</span>
+              <span class="stat-number text-highlight" id="sumRenewContrib">110.9%</span>
+              <span class="stat-sub">Net Zero / Self-Sufficient Mix</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 7: ENERGY CALCULATOR ================= -->
+    <section class="calculator-section section-padding alt-bg" id="calculator">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge calc-badge">
+            <span>🧮 SYSTEM SIZING ESTIMATOR</span>
+          </div>
+          <h2 class="section-title">Interactive Hybrid Sizing Calculator</h2>
+          <p class="section-subtitle">Adjust generation capacities and consumption to estimate daily energy yields and renewable coverage.</p>
+        </div>
+
+        <div class="calc-layout-grid">
+          <!-- Input Form Controls -->
+          <div class="calc-input-panel">
+            <div class="tech-card">
+              <div class="tech-card-header">
+                <h3 class="card-heading">Input Parameters</h3>
+                <button type="button" id="calcResetBtn" class="reset-link-btn" title="Reset to default baseline parameters">↺ Reset Defaults</button>
+              </div>
+
+              <form id="hybridEnergyForm" class="calc-form">
+                <!-- Group 1: Solar System -->
+                <div class="calc-group">
+                  <div class="calc-group-title">
+                    <span class="icon">☀️</span> Solar PV Array Parameters
+                  </div>
+                  <div class="input-field">
+                    <div class="label-row">
+                      <label for="calcSolarCap">Solar Capacity (kW):</label>
+                      <span class="input-val-badge" id="badgeSolarCap">5.0 kW</span>
+                    </div>
+                    <input type="range" id="calcSolarCap" min="0" max="25" step="0.5" value="5.0" class="range-slider">
+                  </div>
+
+                  <div class="input-field">
+                    <div class="label-row">
+                      <label for="calcSunHours">Average Peak Sun Hours (h):</label>
+                      <span class="input-val-badge" id="badgeSunHours">5.5 hrs</span>
+                    </div>
+                    <input type="range" id="calcSunHours" min="1" max="10" step="0.5" value="5.5" class="range-slider">
+                  </div>
+
+                  <div class="input-field">
+                    <div class="label-row">
+                      <label for="calcSolarEff">Solar Efficiency Factor (%):</label>
+                      <span class="input-val-badge" id="badgeSolarEff">85%</span>
+                    </div>
+                    <input type="range" id="calcSolarEff" min="50" max="98" step="1" value="85" class="range-slider">
+                    <small class="field-hint">Accounts for inverter, cabling, and soiling derating.</small>
+                  </div>
+                </div>
+
+                <!-- Group 2: Wind System -->
+                <div class="calc-group">
+                  <div class="calc-group-title">
+                    <span class="icon">🌬️</span> Wind Turbine Parameters
+                  </div>
+                  <div class="input-field">
+                    <div class="label-row">
+                      <label for="calcWindCap">Wind Turbine Capacity (kW):</label>
+                      <span class="input-val-badge" id="badgeWindCap">3.0 kW</span>
+                    </div>
+                    <input type="range" id="calcWindCap" min="0" max="20" step="0.5" value="3.0" class="range-slider">
+                  </div>
+
+                  <div class="input-field">
+                    <div class="label-row">
+                      <label for="calcWindHours">Average Operating Hours (h):</label>
+                      <span class="input-val-badge" id="badgeWindHours">8.0 hrs</span>
+                    </div>
+                    <input type="range" id="calcWindHours" min="1" max="24" step="1" value="8.0" class="range-slider">
+                    <small class="field-hint">Hours per day with wind above cut-in speed.</small>
+                  </div>
+                </div>
+
+                <!-- Group 3: Electrical Load -->
+                <div class="calc-group">
+                  <div class="calc-group-title">
+                    <span class="icon">🏠</span> Daily Consumer Load
+                  </div>
+                  <div class="input-field">
+                    <div class="label-row">
+                      <label for="calcDailyLoad">Daily Load Demand (kWh):</label>
+                      <span class="input-val-badge" id="badgeDailyLoad">35.0 kWh</span>
+                    </div>
+                    <input type="range" id="calcDailyLoad" min="5" max="150" step="5" value="35.0" class="range-slider">
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Output Results Panel -->
+          <div class="calc-results-panel">
+            <div class="tech-card">
+              <div class="tech-card-header">
+                <h3 class="card-heading">Estimated Generation & Coverage Results</h3>
+                <span class="live-tag green">Live Computed</span>
+              </div>
+
+              <!-- Computed Results Cards -->
+              <div class="calc-result-cards">
+                <div class="result-card solar-border">
+                  <div class="res-icon">☀️</div>
+                  <div class="res-info">
+                    <span class="res-label">Estimated Solar Energy</span>
+                    <span class="res-value" id="calcResultSolar">23.38 kWh/day</span>
+                    <span class="res-formula">Formula: Cap × Sun Hours × Efficiency</span>
+                  </div>
+                </div>
+
+                <div class="result-card wind-border">
+                  <div class="res-icon">🌬️</div>
+                  <div class="res-info">
+                    <span class="res-label">Estimated Wind Energy</span>
+                    <span class="res-value" id="calcResultWind">24.00 kWh/day</span>
+                    <span class="res-formula">Formula: Cap × Operating Hours</span>
+                  </div>
+                </div>
+
+                <div class="result-card total-border">
+                  <div class="res-icon">⚡</div>
+                  <div class="res-info">
+                    <span class="res-label">Total Renewable Energy</span>
+                    <span class="res-value" id="calcResultTotal">47.38 kWh/day</span>
+                    <span class="res-formula">Formula: Solar Energy + Wind Energy</span>
+                  </div>
+                </div>
+
+                <div class="result-card contrib-border">
+                  <div class="res-icon">📊</div>
+                  <div class="res-info">
+                    <span class="res-label">Renewable Contribution (%)</span>
+                    <span class="res-value text-green" id="calcResultContrib">135.4%</span>
+                    <span class="res-formula">(Total Renewable / Daily Load) × 100</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dynamic Energy Status Box -->
+              <div class="calc-status-box success" id="calcStatusBox">
+                <div class="status-box-header">
+                  <span class="status-box-icon" id="calcStatusIcon">🌟</span>
+                  <h4 id="calcStatusTitle">Renewable Energy Exceeds Daily Load</h4>
+                </div>
+                <p id="calcStatusMessage">
+                  Total renewable generation (47.38 kWh) exceeds the daily consumption requirement (35.00 kWh). Surplus energy is stored in the battery storage system or can be exported to the grid.
+                </p>
+              </div>
+
+              <!-- Educational Note & Disclaimer -->
+              <div class="calc-disclaimer">
+                <span class="disclaimer-icon">ℹ️</span>
+                <p><strong>Note:</strong> Results are simplified estimates for educational demonstration and academic mini-project presentation. Detailed commercial engineering sizing requires loss factors, stochastic wind distributions, and meteorological TMY datasets.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 8: ABOUT PROJECT ================= -->
+    <section class="about-section section-padding" id="about">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge about-badge">
+            <span>📚 PROJECT DOCUMENTATION</span>
+          </div>
+          <h2 class="section-title">About the Hybrid Renewable Project</h2>
+          <p class="section-subtitle">Academic specifications, engineering architecture, and viva demonstration guidelines.</p>
+        </div>
+
+        <div class="about-grid">
+          <!-- Left Column: Objective & Details -->
+          <div class="about-content-panel">
+            <div class="tech-card">
+              <h3 class="card-heading">Project Overview</h3>
+              <div class="about-block">
+                <h4>Project Title</h4>
+                <p class="project-title-highlight">Hybrid Renewable Energy Monitoring Dashboard</p>
+              </div>
+
+              <div class="about-block">
+                <h4>Objective</h4>
+                <p>To develop an interactive web-based simulation and telemetry dashboard that demonstrates the seamless integration of solar photovoltaic energy, wind turbine generation, battery energy storage systems (BESS), and electrical load demand within an autonomous microgrid.</p>
+              </div>
+
+              <div class="about-block">
+                <h4>Key Features</h4>
+                <ul class="about-features-list">
+                  <li><strong>☀️ Solar PV Monitoring:</strong> Dynamic voltage, current, and irradiance telemetry with diurnal Bell-curve generation profiles.</li>
+                  <li><strong>🌬️ Wind Turbine System:</strong> Interactive blade rotation coupled to simulated wind velocities and aerodynamic cubic power curves.</li>
+                  <li><strong>🔋 Battery BESS Visualization:</strong> Real-time liquid SOC visualization with 20% minimum depth-of-discharge and 100% overcharge cutoff.</li>
+                  <li><strong>⚡ Energy Flow Simulation:</strong> Animated SVG vector energy manager visualizing active power routing and surplus/deficit routing.</li>
+                  <li><strong>📈 Renewable Analytics:</strong> Multi-chart comparisons for diurnal complementarity, load coverage, and net renewable fraction.</li>
+                  <li><strong>🧮 Sizing Calculator:</strong> Dynamic estimation of daily yields, capacity factors, and net grid dependency.</li>
+                  <li><strong>🌱 CO₂ Reduction Estimation:</strong> Real-time avoided greenhouse emissions modeled on local grid carbon intensity (0.82 kg CO₂/kWh).</li>
+                </ul>
+              </div>
+
+              <div class="about-block">
+                <h4>Technologies Employed</h4>
+                <div class="tech-pills">
+                  <span class="tech-pill">HTML5 Semantic Structure</span>
+                  <span class="tech-pill">CSS3 (Grid, Flexbox, Keyframes)</span>
+                  <span class="tech-pill">Vanilla JavaScript (ES6+ Engine)</span>
+                  <span class="tech-pill">Chart.js (Interactive Canvas)</span>
+                  <span class="tech-pill">Scalable Vector Graphics (SVG)</span>
+                </div>
+              </div>
+
+              <div class="about-notice-box">
+                <strong>Important Note:</strong> This project uses simulated/demonstration data for educational evaluation and is not physically connected to real renewable-energy sensors or microcontrollers.
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Microgrid Electrical Architecture -->
+          <div class="about-diagram-panel">
+            <div class="tech-card">
+              <h3 class="card-heading">EEE Microgrid Block Diagram</h3>
+              <p class="text-muted">Standard DC Bus Architecture for Hybrid Solar-Wind-Storage Systems</p>
+
+              <div class="eee-block-diagram">
+                <!-- Solar Branch -->
+                <div class="diagram-row">
+                  <div class="block-box solar-bg">
+                    <span>☀️ Solar PV Array</span>
+                    <small>DC Voltage (V_pv)</small>
+                  </div>
+                  <div class="diagram-conn">──►</div>
+                  <div class="block-box mppt-bg">
+                    <span>DC-DC Converter</span>
+                    <small>(MPPT P&amp;O)</small>
+                  </div>
+                  <div class="diagram-conn">──►</div>
+                  <div class="block-box bus-bg bus-top">
+                    <span>DC Common Bus</span>
+                    <small>(360V – 400V DC)</small>
+                  </div>
+                </div>
+
+                <!-- Wind Branch -->
+                <div class="diagram-row">
+                  <div class="block-box wind-bg">
+                    <span>🌬️ Wind Turbine</span>
+                    <small>AC 3-Phase Gen</small>
+                  </div>
+                  <div class="diagram-conn">──►</div>
+                  <div class="block-box rectifier-bg">
+                    <span>AC-DC Rectifier</span>
+                    <small>+ Boost Converter</small>
+                  </div>
+                  <div class="diagram-conn">──►</div>
+                  <div class="block-box bus-bg bus-mid">
+                    <span>DC Common Bus</span>
+                    <small>Energy Summation</small>
+                  </div>
+                </div>
+
+                <!-- Battery Branch -->
+                <div class="diagram-row">
+                  <div class="block-box battery-bg">
+                    <span>🔋 Battery BESS</span>
+                    <small>48V Li-Ion Bank</small>
+                  </div>
+                  <div class="diagram-conn">◄═►</div>
+                  <div class="block-box bidi-bg">
+                    <span>Bi-directional DC-DC</span>
+                    <small>Charge / Discharge</small>
+                  </div>
+                  <div class="diagram-conn">◄═►</div>
+                  <div class="block-box bus-bg bus-bot">
+                    <span>DC Common Bus</span>
+                    <small>Buffer &amp; Balance</small>
+                  </div>
+                </div>
+
+                <!-- Inverter to Load Branch -->
+                <div class="diagram-out-row">
+                  <div class="diagram-down-arrow">▼</div>
+                  <div class="block-box inv-bg">
+                    <span>DC-AC Inverter (PWM)</span>
+                    <small>Grid Synchronized / Islanded</small>
+                  </div>
+                  <div class="diagram-conn">──►</div>
+                  <div class="block-box load-bg">
+                    <span>🏠 Electrical Load</span>
+                    <small>230V AC Consumer Appliances</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Academic Viva Prep Notes -->
+              <div class="viva-quick-reference">
+                <h4>Key Takeaway for Oral Presentation / Viva</h4>
+                <p>The central advantage of a <em>hybrid</em> system is diurnal complementarity: solar generation peaks during midday hours when solar insolation is highest, while wind turbines compensate during nocturnal and overcast conditions. The battery energy storage system acts as an instantaneous energy buffer to bridge any transient generation-demand deficit.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <img src="assets/renewable-energy.svg" alt="Footer Logo" class="footer-logo">
+        <div>
+          <span class="footer-title">HYBRID RENEWABLE ENERGY MONITOR</span>
+          <span class="footer-sub">Electrical &amp; Electronics Engineering Academic Demonstration</span>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="#home">Home</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#solar">Solar</a>
+        <a href="#wind">Wind</a>
+        <a href="#battery">Battery</a>
+        <a href="#calculator">Calculator</a>
+        <a href="#about">About</a>
+      </div>
+      <div class="footer-copy">
+        <p>© Simulation / Demonstration Data • Pure HTML5, CSS3 &amp; Vanilla JavaScript</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
