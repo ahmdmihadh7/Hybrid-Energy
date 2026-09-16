@@ -2907,3 +2907,297 @@ body.menu-locked {
   }
 }
 
+
+/* =========================================================
+   TIER 8: UNIVERSAL RESPONSIVE HARDENING LAYER
+   Added last so it overrides earlier rules where needed.
+   Covers: fluid typography, overflow safety, notched phones,
+   landscape phones, touch devices, foldables, reduced motion,
+   high-DPI text scaling and print.
+   ========================================================= */
+
+/* --- 8.1 Root behaviour: no iOS text inflation, smooth scroll offset --- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--nav-height) + 1rem);
+}
+
+/* Anchored sections never hide under the fixed navbar */
+section[id] {
+  scroll-margin-top: calc(var(--nav-height) + 0.75rem);
+}
+
+/* --- 8.2 Overflow safety net ---------------------------------------
+   Grid/flex children default to min-width:auto, which lets long
+   monospace readouts (e.g. "1,284.55 kWh") blow the layout wider than
+   the screen. Forcing min-width:0 is the single most effective fix for
+   horizontal scrolling on small phones. */
+.kpi-grid > *,
+.measurement-grid > *,
+.summary-stats-grid > *,
+.calc-result-cards > *,
+.feature-grid > *,
+.hero-grid > *,
+.two-col-grid > *,
+.about-grid > *,
+.calc-layout-grid > *,
+.analytics-charts-grid > *,
+.microgrid-schematic > *,
+.footer-content > * {
+  min-width: 0;
+}
+
+/* Long numbers / labels wrap instead of pushing the box */
+.kpi-value, .m-val, .qs-value, .node-val, .calc-res-value,
+.summary-stat-value, .soc-large-number {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Media never exceeds its container */
+img, svg, canvas, video, iframe {
+  max-width: 100%;
+}
+
+/* Anything inherently wide scrolls inside itself, not the page */
+.sample-data-table-wrap,
+.logic-code-snippet,
+.eee-block-diagram,
+.flow-canvas-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+/* --- 8.3 Fluid typography (scales smoothly between breakpoints) ----- */
+.hero-title {
+  font-size: clamp(1.9rem, 5.2vw + 0.4rem, 3.4rem);
+  line-height: 1.15;
+}
+
+.hero-subtitle {
+  font-size: clamp(0.95rem, 1.1vw + 0.72rem, 1.15rem);
+}
+
+.section-title {
+  font-size: clamp(1.6rem, 3vw + 0.55rem, 2.4rem);
+}
+
+.section-subtitle {
+  font-size: clamp(0.9rem, 0.8vw + 0.72rem, 1.05rem);
+}
+
+.card-heading {
+  font-size: clamp(1.05rem, 1.2vw + 0.8rem, 1.3rem);
+}
+
+/* Fluid horizontal gutters instead of hard steps */
+.container {
+  padding-left: clamp(0.9rem, 3vw, 1.5rem);
+  padding-right: clamp(0.9rem, 3vw, 1.5rem);
+  width: 100%;
+}
+
+/* --- 8.4 Notched / rounded-corner phones (iPhone X+, Android cutouts) */
+.navbar,
+.nav-menu,
+.demo-banner,
+.site-footer {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.site-footer {
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+}
+
+/* --- 8.5 Mobile menu height uses dynamic viewport units ------------
+   100vh is wrong on mobile browsers whose URL bar collapses; dvh fixes
+   it, with a vh fallback for older browsers. */
+@media (max-width: 860px) {
+  .nav-menu {
+    max-height: calc(100vh - var(--nav-height));
+    max-height: calc((var(--app-vh, 1vh) * 100) - var(--nav-height));
+    max-height: calc(100dvh - var(--nav-height));
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* --- 8.6 Landscape phones / very short viewports -------------------- */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root { --nav-height: 56px; }
+
+  .hero-section {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+  }
+
+  .section-padding {
+    padding: 2.25rem 0;
+  }
+
+  .hero-title { font-size: clamp(1.6rem, 4vw, 2.2rem); }
+
+  .chart-wrapper { height: 220px; }
+
+  .battery-inner-chassis { width: 100px; height: 140px; }
+
+  .wind-turbine-stage { height: 190px; }
+
+  .nav-menu { padding: 0.9rem; }
+
+  .nav-link { min-height: 40px; padding: 0.5rem 1rem; }
+}
+
+/* Keep the hero diagram usable when a landscape phone is very wide */
+@media (max-height: 520px) and (orientation: landscape) and (min-width: 700px) {
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .hero-content { text-align: left; }
+  .hero-cta-group { justify-content: flex-start; }
+}
+
+/* --- 8.7 Touch devices: real 44px+ targets, no sticky hover --------- */
+@media (pointer: coarse) {
+  .icon-btn,
+  .hamburger-btn,
+  .sim-btn,
+  .dropdown-toggle,
+  .btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .nav-link,
+  .footer-links a,
+  .dropdown-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Slider thumbs large enough for a fingertip */
+  .range-slider {
+    height: 8px;
+    padding: 0.75rem 0;
+    background-clip: content-box;
+  }
+  .range-slider::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+  }
+  .range-slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+@media (hover: none) {
+  /* Hover-only transforms stay stuck after a tap on touchscreens */
+  .kpi-card:hover,
+  .tech-card:hover,
+  .feature-card:hover,
+  .measure-tile:hover,
+  .summary-stat-box:hover {
+    transform: none;
+  }
+  .range-slider::-webkit-slider-thumb:hover {
+    transform: none;
+  }
+}
+
+/* --- 8.8 Mid-size gap: large phones & small tablets (540-767px) ----- */
+@media (min-width: 540px) and (max-width: 767px) {
+  .hero-quick-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  .stat-separator { display: none; }
+
+  .microgrid-schematic {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sim-button-group {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .footer-content {
+    text-align: center;
+  }
+  .footer-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* --- 8.9 Tablet portrait polish (768-1023px) ----------------------- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .summary-stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .calc-result-cards { grid-template-columns: repeat(2, 1fr); }
+  .chart-wrapper { height: 300px; }
+}
+
+/* --- 8.10 Large tablets in landscape / small laptops --------------- */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .measurement-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* --- 8.11 Ultra-wide monitors & foldables unfolded ------------------ */
+@media (min-width: 1800px) {
+  .container { max-width: 1560px; }
+  .chart-wrapper { height: 360px; }
+  .hero-title { font-size: 3.6rem; }
+}
+
+/* Narrow foldable outer screens (Galaxy Fold ~280px) */
+@media (max-width: 320px) {
+  .container { padding-left: 0.75rem; padding-right: 0.75rem; }
+  .brand-text { display: none; }
+  .sim-button-group { grid-template-columns: 1fr; }
+  .tech-pills { gap: 0.4rem; }
+  .tech-pill { font-size: 0.68rem; }
+  .chart-wrapper { height: 210px; }
+}
+
+/* --- 8.12 Users who asked for less motion -------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .spin-slow,
+  .turbine-blades,
+  .pulse-dot,
+  .wind-gust {
+    animation: none !important;
+  }
+}
+
+/* --- 8.13 Print / PDF export for the report ------------------------ */
+@media print {
+  .navbar,
+  .nav-overlay,
+  .hamburger-btn,
+  .sim-control-panel,
+  .mobile-scroll-hint,
+  .hero-cta-group,
+  .site-footer .footer-links {
+    display: none !important;
+  }
+  body { background: #fff; color: #000; }
+  .section-padding { padding: 1rem 0; page-break-inside: avoid; }
+  .tech-card, .chart-card, .kpi-card { break-inside: avoid; border: 1px solid #ccc; }
+}

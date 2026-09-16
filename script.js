@@ -1101,3 +1101,118 @@ function updateChartsTheme() {
     chart.update();
   });
 }
+
+/* =========================================================
+   RESPONSIVE RUNTIME LAYER
+   Handles viewport changes, orientation flips, chart resizing
+   and small-screen chart density. Appended so it runs after
+   all other initialisation.
+   ========================================================= */
+(function initResponsiveRuntime() {
+  "use strict";
+
+  const MOBILE_NAV_BREAKPOINT = 860; // must match the CSS media query
+
+  /* --- Real viewport height for mobile browsers with collapsing bars --- */
+  function setViewportUnit() {
+    document.documentElement.style.setProperty("--app-vh", window.innerHeight * 0.01 + "px");
+  }
+
+  /* --- Close the mobile drawer if the viewport grows past the breakpoint --- */
+  function syncNavState() {
+    if (window.innerWidth > MOBILE_NAV_BREAKPOINT) {
+      const navMenu = document.getElementById("navMenu");
+      const navOverlay = document.getElementById("navOverlay");
+      const hamburgerBtn = document.getElementById("hamburgerBtn");
+      if (navMenu) navMenu.classList.remove("open");
+      if (navOverlay) navOverlay.classList.remove("open");
+      if (hamburgerBtn) hamburgerBtn.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("menu-locked");
+    }
+  }
+
+  /* --- Chart density: fewer ticks and smaller fonts on narrow screens --- */
+  function applyChartDensity() {
+    if (typeof charts === "undefined" || !charts) return;
+
+    const w = window.innerWidth;
+    const compact = w < 640;
+    const medium = w < 1024;
+    const fontSize = compact ? 9 : medium ? 10 : 12;
+
+    Object.values(charts).forEach(chart => {
+      if (!chart || !chart.options) return;
+
+      if (chart.options.scales) {
+        Object.values(chart.options.scales).forEach(scale => {
+          if (!scale) return;
+          scale.ticks = scale.ticks || {};
+          scale.ticks.font = Object.assign({}, scale.ticks.font, { size: fontSize });
+          scale.ticks.maxTicksLimit = compact ? 5 : medium ? 8 : 12;
+          scale.ticks.maxRotation = compact ? 45 : 0;
+          scale.ticks.autoSkip = true;
+          if (scale.title) scale.title.display = !compact;
+        });
+      }
+
+      if (chart.options.plugins && chart.options.plugins.legend) {
+        const legend = chart.options.plugins.legend;
+        legend.labels = legend.labels || {};
+        legend.labels.font = Object.assign({}, legend.labels.font, { size: fontSize });
+        legend.labels.boxWidth = compact ? 10 : 20;
+        legend.labels.padding = compact ? 8 : 14;
+        legend.position = compact ? "bottom" : (legend.position || "top");
+      }
+
+      chart.options.maintainAspectRatio = false;
+      chart.options.responsive = true;
+
+      // Tooltips triggered by touch need a more forgiving hit area
+      if (chart.options.interaction) {
+        chart.options.interaction.mode = compact ? "index" : (chart.options.interaction.mode || "nearest");
+        chart.options.interaction.intersect = compact ? false : chart.options.interaction.intersect;
+      }
+
+      chart.update("none");
+    });
+  }
+
+  /* --- Force canvases to recompute after a layout or orientation change --- */
+  function resizeCharts() {
+    if (typeof charts === "undefined" || !charts) return;
+    Object.values(charts).forEach(chart => {
+      if (chart && typeof chart.resize === "function") chart.resize();
+    });
+  }
+
+  /* --- Debounced handler so phones don't thrash while scrolling --- */
+  let resizeTimer = null;
+  let lastWidth = window.innerWidth;
+
+  function onViewportChange() {
+    setViewportUnit();
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      // Ignore pure height changes from mobile toolbar show/hide
+      const widthChanged = Math.abs(window.innerWidth - lastWidth) > 1;
+      lastWidth = window.innerWidth;
+      syncNavState();
+      if (widthChanged) applyChartDensity();
+      resizeCharts();
+    }, 180);
+  }
+
+  window.addEventListener("resize", onViewportChange, { passive: true });
+  window.addEventListener("orientationchange", () => {
+    // Orientation needs a beat before the browser reports final dimensions
+    setTimeout(onViewportChange, 250);
+  });
+
+  /* --- Initial run --- */
+  setViewportUnit();
+  window.addEventListener("load", () => {
+    syncNavState();
+    applyChartDensity();
+    resizeCharts();
+  });
+})();
