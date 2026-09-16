@@ -2404,42 +2404,163 @@ h1, h2, h3, h4 {
   color: var(--text-muted);
 }
 
-/* --- RESPONSIVE MEDIA QUERIES --- */
-@media (max-width: 1100px) {
+/* --- MOBILE BACKDROP OVERLAY & SCROLL HINTS --- */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.nav-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.menu-locked {
+  overflow: hidden;
+}
+
+.mobile-scroll-hint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  margin-bottom: 0.85rem;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px dashed var(--accent-wind);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-wind);
+  text-align: center;
+}
+
+/* =========================================================
+   COMPREHENSIVE RESPONSIVE DESIGN (ALL DEVICES)
+   Tier 1: Extra Large Desktops (> 1400px)
+   Tier 2: Standard Laptops & Desktops (1024px - 1399px)
+   Tier 3: Tablets in Landscape & Small Laptops (880px - 1023px)
+   Tier 4: Tablets in Portrait (768px - 879px)
+   Tier 5: Large Phablets & Mobile Landscape (540px - 767px)
+   Tier 6: Compact Mobile Devices (320px - 539px)
+   ========================================================= */
+
+/* --- TIER 1: EXTRA LARGE SCREENS (> 1400px) --- */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1360px;
+  }
+  .hero-title {
+    font-size: 3.4rem;
+  }
+  .kpi-value {
+    font-size: 1.85rem;
+  }
+}
+
+/* --- TIER 2: STANDARD LAPTOPS (1024px - 1280px) --- */
+@media (max-width: 1280px) {
   .kpi-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 1.1rem;
   }
   .summary-stats-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 1.1rem;
   }
-  .hero-title {
-    font-size: 2.5rem;
-  }
-}
-
-@media (max-width: 900px) {
   .hero-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1.1fr 0.9fr;
     gap: 2.5rem;
   }
+}
+
+/* --- TIER 3 & 4: TABLETS (768px - 1023px) --- */
+@media (max-width: 1023px) {
+  :root {
+    --nav-height: 68px;
+  }
+
+  .section-padding {
+    padding: 4rem 0;
+  }
+
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .hero-content {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-cta-group {
+    justify-content: center;
+  }
+
+  .hero-quick-stats {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .hero-visual {
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
   .two-col-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
+
   .analytics-charts-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
+
   .calc-layout-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
+
   .about-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
+
   .feature-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+
+  .eee-block-diagram {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.75rem;
+  }
+
+  .diagram-row, .diagram-out-row {
+    min-width: 580px;
   }
 }
 
-@media (max-width: 768px) {
+/* --- TIER 4 & 5: MOBILE MENU ACTIVATION (< 860px) --- */
+@media (max-width: 860px) {
   .hamburger-btn {
     display: flex;
   }
@@ -2450,13 +2571,17 @@ h1, h2, h3, h4 {
     left: 0;
     right: 0;
     background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--accent-cyan);
     padding: 1.5rem;
-    transform: translateY(-150%);
+    transform: translateY(-160%);
     opacity: 0;
     pointer-events: none;
-    transition: all 0.3s ease;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
     box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    max-height: calc(100vh - var(--nav-height));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .nav-menu.open {
@@ -2468,62 +2593,317 @@ h1, h2, h3, h4 {
   .nav-list {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.5rem;
+    gap: 0.6rem;
   }
 
   .nav-link {
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+    font-size: 1.05rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+    min-height: 48px;
   }
 
-  .hero-title {
-    font-size: 2.1rem;
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 
-  .kpi-grid {
-    grid-template-columns: 1fr 1fr;
+  .chart-wrapper {
+    height: 280px;
   }
 
-  .measurement-grid {
-    grid-template-columns: 1fr 1fr;
+  .mobile-scroll-hint {
+    display: flex;
+  }
+
+  .flow-canvas-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.75rem;
+  }
+
+  .flow-svg {
+    min-width: 680px;
+    height: 380px;
   }
 
   .battery-stage {
     flex-direction: column;
-  }
-
-  .summary-stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .calc-result-cards {
-    grid-template-columns: 1fr;
+    gap: 2rem;
   }
 }
 
-@media (max-width: 520px) {
+/* --- TIER 5: COMPACT TABLETS & PHABLETS (540px - 767px) --- */
+@media (max-width: 767px) {
+  .section-title {
+    font-size: 1.85rem;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .summary-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .measurement-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+  }
+
+  .calc-result-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+  }
+
+  .flow-legend {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+}
+
+/* --- TIER 6: MOBILE PHONES (320px - 539px) --- */
+@media (max-width: 539px) {
+  :root {
+    --nav-height: 64px;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .section-padding {
+    padding: 3rem 0;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+  }
+
+  .brand-tag {
+    font-size: 0.6rem;
+  }
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .hero-title {
+    font-size: 1.95rem;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .hero-cta-group .btn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .hero-quick-stats {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    padding: 1rem;
+  }
+
+  .stat-separator {
+    display: none;
+  }
+
+  .quick-stat {
+    align-items: center;
+    text-align: center;
+  }
+
+  .microgrid-schematic {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .schematic-node {
+    padding: 0.75rem;
+  }
+
+  .schematic-node.node-controller {
+    grid-column: span 1;
+  }
+
+  .flow-arrow.right {
+    display: none;
+  }
+
+  .flow-arrow.down {
+    bottom: -14px;
+  }
+
+  /* Section Header Flex & Simulation Toolbar */
+  .section-header-flex {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+
+  .sim-control-panel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.85rem;
+  }
+
+  .sim-status-indicator {
+    justify-content: center;
+  }
+
+  .sim-button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 0.4rem;
+  }
+
+  .sim-btn {
+    justify-content: center;
+    padding: 0.6rem 0.5rem;
+    min-height: 44px;
+  }
+
+  .dropdown-menu {
+    right: auto;
+    left: 0;
+    width: 100%;
+    min-width: 260px;
+  }
+
+  /* KPI Grid */
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .kpi-card {
+    padding: 1rem 0.85rem;
+  }
+
+  .kpi-value {
+    font-size: 1.35rem;
+  }
+
+  .kpi-label {
+    font-size: 0.75rem;
+  }
+
+  .kpi-subtext {
+    font-size: 0.68rem;
+  }
+
+  /* Measurement Grid in Solar, Wind, Battery */
+  .measurement-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .measure-tile {
+    padding: 0.75rem;
+  }
+
+  .m-val {
+    font-size: 1.15rem;
+  }
+
+  .panel-visual-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .chart-wrapper {
+    height: 240px;
+  }
+
+  .chart-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .tech-card {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Battery Stage */
+  .battery-stage {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .battery-inner-chassis {
+    width: 120px;
+    height: 170px;
+  }
+
+  .soc-large-number {
+    font-size: 1.85rem;
+  }
+
+  .radial-gauge-container {
+    width: 100px;
+    height: 100px;
+  }
+
+  .radial-pct {
+    font-size: 1.15rem;
+  }
+
+  /* Summary Stats in Analytics */
+  .summary-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .summary-stat-box {
+    padding: 1rem;
+  }
+
+  /* Calculator */
+  .calc-result-cards {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .range-slider::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Footer */
+  .footer-links {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+/* --- TIER 7: ULTRA-COMPACT SMARTPHONES (< 360px) --- */
+@media (max-width: 359px) {
   .kpi-grid {
     grid-template-columns: 1fr;
   }
   .measurement-grid {
     grid-template-columns: 1fr;
   }
-  .hero-cta-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
   .hero-quick-stats {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .stat-separator {
-    display: none;
-  }
-  .summary-stats-grid {
     grid-template-columns: 1fr;
   }
-  .section-header-flex {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
+

@@ -124,20 +124,40 @@ function getThemeColors() {
 function initNavigation() {
   const hamburgerBtn = document.getElementById("hamburgerBtn");
   const navMenu = document.getElementById("navMenu");
+  const navOverlay = document.getElementById("navOverlay");
   const navLinks = document.querySelectorAll(".nav-link");
 
-  // Mobile drawer toggle
-  hamburgerBtn.addEventListener("click", () => {
+  function closeMenu() {
+    navMenu.classList.remove("open");
+    if (navOverlay) navOverlay.classList.remove("open");
+    hamburgerBtn.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-locked");
+  }
+
+  function toggleMenu() {
     const isOpen = navMenu.classList.toggle("open");
+    if (navOverlay) navOverlay.classList.toggle("open", isOpen);
     hamburgerBtn.setAttribute("aria-expanded", isOpen);
-  });
+    document.body.classList.toggle("menu-locked", isOpen);
+  }
+
+  // Mobile drawer toggle
+  hamburgerBtn.addEventListener("click", toggleMenu);
+
+  if (navOverlay) {
+    navOverlay.addEventListener("click", closeMenu);
+  }
 
   // Close mobile drawer upon link click
   navLinks.forEach(link => {
-    link.addEventListener("click", () => {
-      navMenu.classList.remove("open");
-      hamburgerBtn.setAttribute("aria-expanded", "false");
-    });
+    link.addEventListener("click", closeMenu);
+  });
+
+  // Close with Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && navMenu.classList.contains("open")) {
+      closeMenu();
+    }
   });
 
   // IntersectionObserver for active section highlighting in navbar

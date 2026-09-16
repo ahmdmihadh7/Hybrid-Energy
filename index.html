@@ -54,6 +54,9 @@
     </div>
   </header>
 
+  <!-- Mobile Navigation Backdrop Overlay -->
+  <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
+
   <!-- ================= GLOBAL DISCLAIMER BADGE ================= -->
   <div class="demo-banner">
     <div class="container banner-content">
@@ -421,6 +424,12 @@
               <span class="legend-item"><span class="legend-dot load"></span> Load Consumption</span>
               <span class="legend-item"><span class="legend-dot battery"></span> BESS Transfer</span>
             </div>
+          </div>
+
+          <!-- Mobile Scroll Tip (auto-hidden on desktop) -->
+          <div class="mobile-scroll-hint" aria-hidden="true">
+            <span class="hint-icon">↔️</span>
+            <span>Scroll or drag horizontally to view complete microgrid schematic</span>
           </div>
 
           <div class="flow-canvas-wrapper">
